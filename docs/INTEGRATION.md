@@ -1,6 +1,6 @@
 # Incremental Integration Guide
 
-<!-- rev:002 -->
+<!-- rev:003 -->
 
 How the OpenVPN3 **Go + C/C++** set is integrated in this module: all C/C++
 build dependencies (OpenVPN3 core, asio, lz4, jsoncpp, tap-windows.h) are
@@ -16,7 +16,8 @@ This guide keeps the tree green at every step.
 2. **`CGO_ENABLED=0 go build ./...` always passes.** The stub
    (`engine_stub.go`) is the safety net for CI and non-C platforms.
 3. **Validation and hardening live in build-tag-free files** (`client.go`,
-   `errors.go`) so they run on every build and under `go test -short`.
+   `tunnel.go`, `types.go` — sentinel errors and input checks) so they run on
+   every build and under `go test -short`.
 4. **No secret hits a log.** Credentials are copied, used, then `Wipe`d.
 
 ## Module map
@@ -40,16 +41,24 @@ the C-ABI shim entry point (cgo cannot call C++ directly) are under `shim/`.
 
 ### 2 — Wire the cgo bridge
 
-In `cgo_flags.go` / `engine_windows.go`, the real preamble is already wired:
+All `#cgo` directives live in `cgo_flags.go` (`windows && cgo`); see that file
+for the authoritative set. They point at the vendored trees via
+`${SRCDIR}`-relative paths — abbreviated:
 
 ```go
 /*
-#cgo CXXFLAGS: -std=c++17 -I${SRCDIR}/native/include
-#cgo LDFLAGS: -L${SRCDIR}/native/lib -lovpn3core -lstdc++
-#include "ovpn3_cgo.h"
+#cgo CPPFLAGS: -I${SRCDIR}/openvpn -I${SRCDIR}/shim -I${SRCDIR}/deps/asio/asio/include -I${SRCDIR}/deps/lz4/lib -I${SRCDIR}/deps/jsoncpp/include -I${SRCDIR}/deps/tap-windows/include
+#cgo CPPFLAGS: -DUSE_OPENSSL -DUSE_ASIO -DASIO_STANDALONE -DHAVE_LZ4
+#cgo CXXFLAGS: -std=c++17 -fexceptions
+#cgo LDFLAGS: -lssl -lcrypto -lstdc++
+#cgo LDFLAGS: -lws2_32 -liphlpapi -lcrypt32 // + more Windows syslibs
 */
 import "C"
 ```
+
+OpenSSL's own `-I`/`-L` are NOT hardcoded here: they come from the toolchain's
+default paths, from `CGO_CPPFLAGS`/`CGO_LDFLAGS`, or from the gitignored
+`cgo_openssl_local.go` written by `go run ./cmd/openvpn bootstrap`.
 
 Verify: `CGO_ENABLED=1 go build ./...` (needs gcc/clang). The `CGO_ENABLED=0`
 build must still pass via the stub.
