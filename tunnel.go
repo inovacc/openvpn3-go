@@ -26,13 +26,14 @@ const (
 )
 
 // ErrUnavailable is returned when the cgo OpenVPN3 engine is not compiled into
-// the binary (built with CGO_ENABLED=0). Build with CGO_ENABLED=1 -tags cgo and
-// run the module bootstrap (go run github.com/inovacc/openvpn3-go/cmd/openvpn).
+// the binary (built with CGO_ENABLED=0). Build with CGO_ENABLED=1 -tags cgo on
+// Windows with a C toolchain; the C/C++ deps are vendored, so no bootstrap step
+// is needed — only OpenSSL must be on the toolchain path (or via CGO_*FLAGS).
 var ErrUnavailable = errors.New("openvpn3: cgo engine unavailable (build CGO_ENABLED=1 -tags cgo)")
 
-// ErrNotImplemented is returned by the Linux/macOS connectors in v0: the per-OS
-// dependency bootstrap and file separation exist, but the tunnel connect path is
-// not yet wired/verified on those platforms.
+// ErrNotImplemented is returned by the Linux/macOS connectors in v0: the
+// vendored C/C++ deps and per-OS file separation exist, but the tunnel connect
+// path is not yet wired/verified on those platforms.
 var ErrNotImplemented = errors.New("openvpn3: connector not implemented on this OS yet")
 
 // ConnectInput carries everything the engine needs to bring up a tunnel. Set

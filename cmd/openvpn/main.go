@@ -1,6 +1,8 @@
-// Command openvpn is the functional CLI for the openvpn3-go engine: it bootstraps
-// the C/C++ build dependencies, and (on a CGO_ENABLED=1 Windows build) connects a
-// tunnel in-process, streaming OpenVPN3 lifecycle events + log messages.
+// Command openvpn is the functional CLI for the openvpn3-go engine. C/C++
+// dependencies are vendored in the module; `bootstrap` is a dev helper that
+// writes machine-local OpenSSL cgo flags. On a CGO_ENABLED=1 Windows build,
+// `connect` runs a tunnel in-process, streaming OpenVPN3 lifecycle events +
+// log messages.
 //
 // Daemonless: the engine runs IN this process, so `connect` is a FOREGROUND
 // session — it blocks streaming events until Ctrl-C, then disconnects. There is
@@ -8,7 +10,7 @@
 // tunnel); the live event stream IS the status, Ctrl-C IS the disconnect.
 //
 //	openvpn connect <profile.ovpn> [--user U] [--pass-stdin] [--kill-switch] [--verbose] [--json]
-//	openvpn bootstrap [--force]
+//	openvpn bootstrap [--root DIR]
 //	openvpn version
 //
 // The tunnel requires elevation (TUN + routes): run `connect` from an elevated
@@ -25,12 +27,12 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
 
 	openvpn3 "github.com/inovacc/openvpn3-go"
-	"github.com/inovacc/openvpn3-go/bootstrap"
 	"golang.org/x/term"
 )
 
@@ -60,7 +62,7 @@ func usage() {
 
 Usage:
   openvpn connect <profile.ovpn> [flags]   connect a tunnel (foreground; streams events)
-  openvpn bootstrap [--force]              fetch/init the C/C++ build dependencies
+  openvpn bootstrap [--root DIR]           dev helper: write machine-local OpenSSL cgo flags
   openvpn version                          print version + engine availability
 
 connect flags:
@@ -74,10 +76,15 @@ connect flags:
 
 func cmdBootstrap(args []string) int {
 	fs := flag.NewFlagSet("bootstrap", flag.ExitOnError)
-	force := fs.Bool("force", false, "re-fetch dependencies even when present")
-	root := fs.String("root", "", "module root override (default: auto-detect)")
+	root := fs.String("root", ".", "module checkout root (dir containing go.mod)")
 	_ = fs.Parse(args)
-	if err := bootstrap.Run(bootstrap.Options{ModuleRoot: *root, Force: *force}); err != nil {
+
+	mod, err := os.ReadFile(filepath.Join(*root, "go.mod"))
+	if err != nil || !strings.Contains(string(mod), "module github.com/inovacc/openvpn3-go") {
+		fmt.Fprintf(os.Stderr, "openvpn bootstrap: %s is not the openvpn3-go checkout root (run from a source checkout, or pass --root)\n", *root)
+		return 1
+	}
+	if err := setupOpenSSL(*root); err != nil {
 		fmt.Fprintln(os.Stderr, "openvpn bootstrap: error:", err)
 		return 1
 	}

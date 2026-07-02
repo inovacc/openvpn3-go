@@ -127,3 +127,24 @@ tasks:
     cmds:
       - rm -f openvpn openvpn.exe coverage.out coverage.html
       - rm -rf dist/
+
+  vendor:sync:
+    desc: "MAINTAINER: re-fetch pinned upstreams and refresh vendored C/C++ trees"
+    cmds:
+      - go -C tools run ./vendorsync
+
+  vendor:verify:
+    desc: Print provenance checksums of the vendored C/C++ trees
+    cmds:
+      - go -C tools run ./vendorsync -verify
+
+  tools:check:
+    desc: Vet and test the tools module
+    cmds:
+      - go -C tools vet ./...
+      - go -C tools test ./...
+
+  module:verify:
+    desc: Validate the module zip and build a local file:// GOPROXY under dist/goproxy
+    cmds:
+      - go -C tools run ./modverify -version v0.1.1 -proxy ../dist/goproxy

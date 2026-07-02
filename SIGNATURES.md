@@ -1,14 +1,14 @@
 # OpenVPN3 ClientAPI / TunBuilderBase — REAL signatures (source of truth)
 
-Pinned submodule tag: **`release/3.11.6`**
-Submodule commit: **`5b7841a847619e9e1ba3f7371e0c9e2743383481`**
+Pinned vendored tag: **`release/3.11.6`**
+Vendored commit: **`5b7841a847619e9e1ba3f7371e0c9e2743383481`**
 Captured: 2026-06-02
 
 This file records the EXACT C++ signatures/fields for the pinned tag. The C++ shim
 (T7) and the cgo binding (T8) MUST match these byte-for-byte. Anything that differs
 from the original task assumptions is flagged with **[DIFF]**.
 
-All line refs are relative to the submodule root `pkg/openvpn3/openvpn/`.
+All line refs are relative to the vendored tree root `openvpn/`.
 
 ---
 
