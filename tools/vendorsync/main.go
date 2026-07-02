@@ -75,7 +75,7 @@ var trees = []tree{
 	{
 		Name: "tap-windows6",
 		URL:  "https://github.com/OpenVPN/tap-windows6.git",
-		Ref:  "", // HEAD; the resolved SHA is printed for the NOTICE table
+		Ref:  "0cad8664c2a51832df61f2e1853b6da317d1c129", // pinned; matches the vendored deps/tap-windows header
 		Keep: map[string]string{
 			"src/tap-windows.h": "deps/tap-windows/include/tap-windows.h",
 		},
