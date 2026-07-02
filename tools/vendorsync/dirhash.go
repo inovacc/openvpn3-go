@@ -41,7 +41,7 @@ func dirHash(dir string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("read %s: %w", rel, err)
 		}
-		fmt.Fprintf(h, "%s\n", rel)
+		h.Write([]byte(rel + "\n"))
 		h.Write(bytes.ReplaceAll(b, []byte("\r\n"), []byte("\n")))
 	}
 	return hex.EncodeToString(h.Sum(nil)), nil

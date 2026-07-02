@@ -132,7 +132,10 @@ func resolveRoot(explicit string) (string, error) {
 		r = strings.TrimSpace(string(out))
 	}
 	mod, err := os.ReadFile(filepath.Join(r, "go.mod"))
-	if err != nil || !strings.Contains(string(mod), "module github.com/inovacc/openvpn3-go") {
+	if err != nil {
+		return "", fmt.Errorf("read go.mod in %s: %w", r, err)
+	}
+	if !strings.Contains(string(mod), "module github.com/inovacc/openvpn3-go") {
 		return "", fmt.Errorf("%s is not the openvpn3-go module root", r)
 	}
 	return r, nil
@@ -276,15 +279,22 @@ func patchCallHpp(root string) error {
 }
 
 // printTable emits the NOTICE.md provenance table rows (name | checksum).
+// All hashes are computed before any output is printed, so a failure never
+// produces a truncated table.
 func printTable(root string) {
-	fmt.Println("| tree | sha256 (dirhash, LF-normalized) |")
-	fmt.Println("|------|----------------------------------|")
+	rows := make([]string, 0, len(vendorRoots))
 	for _, v := range vendorRoots {
 		h, err := dirHash(filepath.Join(root, filepath.FromSlash(v.path)))
 		if err != nil {
 			fatal(err)
 		}
-		fmt.Printf("| %s (`%s/`) | `%s` |\n", v.name, v.path, h)
+		rows = append(rows, fmt.Sprintf("| %s (`%s/`) | `%s` |", v.name, v.path, h))
+	}
+
+	fmt.Println("| tree | sha256 (dirhash, LF-normalized) |")
+	fmt.Println("|------|----------------------------------|")
+	for _, row := range rows {
+		fmt.Println(row)
 	}
 }
 

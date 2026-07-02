@@ -22,9 +22,9 @@ func TestDirHash(t *testing.T) {
 	}
 
 	tests := []struct {
-		name   string
-		a, b   map[string]string
-		equal  bool
+		name  string
+		a, b  map[string]string
+		equal bool
 	}{
 		{
 			name:  "identical trees hash equal",
