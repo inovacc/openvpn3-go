@@ -8,10 +8,10 @@ import (
 )
 
 // engine_darwin.go is the macOS connector. v0 scope (approved 2026-06-30): the
-// per-OS dependency bootstrap (bootstrap/bootstrap_darwin.go) and file
-// separation exist, but the cgo tunnel connect path is not yet wired/verified on
-// macOS, so Connect reports ErrNotImplemented. A future revision lands the real
-// OpenVPN3 C++ binding for macOS (utun, Homebrew OpenSSL) here.
+// C/C++ deps are vendored (see openvpn/, deps/) and the per-OS file separation
+// exists, but the cgo tunnel connect path is not yet wired/verified on macOS, so
+// Connect reports ErrNotImplemented. A future revision lands the real OpenVPN3
+// C++ binding for macOS (utun, Homebrew OpenSSL) here.
 
 // SetLogger is a no-op until the macOS engine is wired.
 func SetLogger(*slog.Logger) {}

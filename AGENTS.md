@@ -1,13 +1,13 @@
 # AGENTS.md
-<!-- rev:001 -->
+<!-- rev:002 -->
 
 ## Project overview
 
-`github.com/inovacc/openvpn3-go` — a standalone **cgo** Go module wrapping the OpenVPN3 core. Exposes a public `Tunnel` interface (`tunnel.go`, `client.go`, `profile.go`, `types.go`) with per-OS engine implementations (`engine_windows.go`, `engine_darwin.go`, `engine_unix.go`, `engine_stub.go`) and cgo bridges (`cgo_bridge.cpp`, `cgo_shim_windows.cpp`, `callbacks.go`). The `bootstrap/` package fetches and builds the pinned OpenVPN3 core per OS. CLI lives at `cmd/openvpn`. Go 1.25.0; sole dependency `golang.org/x/sys`.
+`github.com/inovacc/openvpn3-go` — a standalone **cgo** Go module wrapping the OpenVPN3 core. Exposes a public `Tunnel` interface (`tunnel.go`, `client.go`, `profile.go`, `types.go`) with per-OS engine implementations (`engine_windows.go`, `engine_darwin.go`, `engine_unix.go`, `engine_stub.go`) and cgo bridges (`cgo_bridge.cpp`, `cgo_shim_windows.cpp`, `callbacks.go`). C/C++ sources (OpenVPN3 core pinned at `5b7841a`, asio, lz4, jsoncpp, tap-windows.h) are **vendored** under `openvpn/` and `deps/`; `tools/` (nested module) holds the maintainer `vendorsync`/`modverify` tools. CLI lives at `cmd/openvpn`. Go 1.25.0; sole dependency `golang.org/x/sys`.
 
 ## Dev environment tips
 
-- This is a **cgo** module — a C/C++ toolchain (and OpenVPN3 core) is required to build. Run the per-OS bootstrap in `bootstrap/` before building the cgo paths; the OpenVPN3 core is pinned (see commit history / `bootstrap/`).
+- This is a **cgo** module — a C/C++ toolchain is required to build. No bootstrap needed — C/C++ deps are vendored. On Windows, run `go run ./cmd/openvpn bootstrap` once if OpenSSL isn't on your toolchain's default paths (writes gitignored `cgo_openssl_local.go`).
 - Prefer the **Taskfile** for everything (`task --list`). Binary = `openvpn`, main = `./cmd/openvpn`.
 - Pure-Go paths build without the core via the stub engine (`engine_stub.go`, `stub.go`).
 

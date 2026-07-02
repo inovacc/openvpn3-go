@@ -8,8 +8,8 @@ import (
 )
 
 // engine_unix.go is the Linux connector. v0 scope (approved 2026-06-30): the
-// per-OS dependency bootstrap (bootstrap/bootstrap_unix.go) and file separation
-// exist, but the cgo tunnel connect path is not yet wired/verified on Linux, so
+// C/C++ deps are vendored (see openvpn/, deps/) and the per-OS file separation
+// exists, but the cgo tunnel connect path is not yet wired/verified on Linux, so
 // Connect reports ErrNotImplemented. A future revision lands the real OpenVPN3
 // C++ binding for Linux (TUN via /dev/net/tun, system OpenSSL) here.
 
