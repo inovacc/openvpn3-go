@@ -29,39 +29,46 @@ import (
 const modPath = "github.com/inovacc/openvpn3-go"
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, "modverify:", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	version := flag.String("version", "", "semver to stamp, e.g. v0.1.1 (required)")
 	proxy := flag.String("proxy", "", "emit a file:// GOPROXY layout into this dir")
 	flag.Parse()
 	if *version == "" || !strings.HasPrefix(*version, "v") {
-		fatal(fmt.Errorf("-version vX.Y.Z is required"))
+		return fmt.Errorf("-version vX.Y.Z is required")
 	}
 
 	root, err := gitToplevel()
 	if err != nil {
-		fatal(err)
+		return err
 	}
 
 	// 1. Export HEAD to a temp dir via git archive.
 	export, err := os.MkdirTemp("", "modverify-export")
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	defer func() { _ = os.RemoveAll(export) }()
 	archive := exec.Command("git", "-C", root, "archive", "--format=tar", "HEAD")
 	untar := exec.Command("tar", "-x", "-C", export)
 	untar.Stdin, err = archive.StdoutPipe()
 	if err != nil {
-		fatal(fmt.Errorf("git archive stdout pipe: %w", err))
+		return fmt.Errorf("git archive stdout pipe: %w", err)
 	}
 	untar.Stderr = os.Stderr
 	if err := untar.Start(); err != nil {
-		fatal(err)
+		return err
 	}
 	if err := archive.Run(); err != nil {
-		fatal(fmt.Errorf("git archive: %w", err))
+		return fmt.Errorf("git archive: %w", err)
 	}
 	if err := untar.Wait(); err != nil {
-		fatal(fmt.Errorf("untar archive: %w", err))
+		return fmt.Errorf("untar archive: %w", err)
 	}
 
 	// 2. Build + validate the module zip.
@@ -69,39 +76,39 @@ func main() {
 	zipPath := filepath.Join(os.TempDir(), "openvpn3-go-"+*version+".zip")
 	f, err := os.Create(zipPath)
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	if err := zip.CreateFromDir(f, mv, export); err != nil {
-		fatal(fmt.Errorf("module zip validation FAILED: %w", err))
+		return fmt.Errorf("module zip validation failed: %w", err)
 	}
 	if err := f.Close(); err != nil {
-		fatal(err)
+		return err
 	}
 	fi, err := os.Stat(zipPath)
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	fmt.Printf("module zip OK: %s (%.1f MB)\n", zipPath, float64(fi.Size())/1e6)
 
 	// 3. Optional file:// proxy layout.
 	if *proxy == "" {
-		return
+		return nil
 	}
 	vdir := filepath.Join(*proxy, filepath.FromSlash(modPath), "@v")
 	if err := os.MkdirAll(vdir, 0o755); err != nil {
-		fatal(err)
+		return err
 	}
 	gomod, err := os.ReadFile(filepath.Join(export, "go.mod"))
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	info, err := json.Marshal(map[string]string{"Version": *version, "Time": "2026-07-02T00:00:00Z"})
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	zipBytes, err := os.ReadFile(zipPath)
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	for name, content := range map[string][]byte{
 		"list":             []byte(*version + "\n"),
@@ -110,14 +117,15 @@ func main() {
 		*version + ".zip":  zipBytes,
 	} {
 		if err := os.WriteFile(filepath.Join(vdir, name), content, 0o644); err != nil {
-			fatal(err)
+			return err
 		}
 	}
 	abs, err := filepath.Abs(*proxy)
 	if err != nil {
-		fatal(err)
+		return err
 	}
 	fmt.Printf("proxy ready: GOPROXY=file:///%s\n", filepath.ToSlash(abs))
+	return nil
 }
 
 func gitToplevel() (string, error) {
@@ -126,9 +134,4 @@ func gitToplevel() (string, error) {
 		return "", fmt.Errorf("resolve git toplevel: %w", err)
 	}
 	return strings.TrimSpace(string(out)), nil
-}
-
-func fatal(err error) {
-	fmt.Fprintln(os.Stderr, "modverify:", err)
-	os.Exit(1)
 }
