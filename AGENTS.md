@@ -1,5 +1,5 @@
 # AGENTS.md
-<!-- rev:002 -->
+<!-- rev:003 -->
 
 ## Project overview
 
@@ -44,7 +44,7 @@ The suite must pass before merge. Slow / live tests (`live_integration_test.go`)
 
 - Never commit secrets, VPN credentials, or `.ovpn` profiles with embedded keys.
 - Validate all profile / config input before passing into cgo.
-- Verify the pinned OpenVPN3 core checksum/commit when bootstrapping (see `SIGNATURES.md` / `bootstrap/`).
+- Verify the vendored C/C++ tree checksums with `task vendor:verify` against the provenance table in `NOTICE.md` (see also `SIGNATURES.md`).
 
 ## PR / commit instructions
 
