@@ -1,0 +1,56 @@
+# GoReleaser config for openvpn3-go.
+#
+# NOTE: released binaries are built CGO_ENABLED=0 — i.e. the pure-Go STUB
+# engine. They cross-compile cleanly to every OS/arch, but cannot open a real
+# tunnel (openvpn3.Available() == false; Connect returns ErrUnavailable). The
+# functional cgo OpenVPN3 engine is Windows-only and must be built from source
+# with a C toolchain (see README). These artifacts ship the CLI shell + let the
+# module be consumed at a tagged version via `go get`.
+version: 2
+
+project_name: openvpn3-go
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: openvpn
+    main: ./cmd/openvpn
+    binary: openvpn
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^ci:"
+
+release:
+  draft: false
+  prerelease: auto

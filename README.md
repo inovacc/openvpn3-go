@@ -1,5 +1,11 @@
 # openvpn3-go
-<!-- rev:001 -->
+<!-- rev:002 -->
+
+[![test](https://github.com/inovacc/openvpn3-go/actions/workflows/test.yml/badge.svg)](https://github.com/inovacc/openvpn3-go/actions/workflows/test.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/inovacc/openvpn3-go.svg)](https://pkg.go.dev/github.com/inovacc/openvpn3-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/inovacc/openvpn3-go)](https://goreportcard.com/report/github.com/inovacc/openvpn3-go)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/inovacc/openvpn3-go)](go.mod)
+[![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)
 
 > A daemon application built on [mantle](https://github.com/inovacc/mantle).
 
