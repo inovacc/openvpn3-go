@@ -13,7 +13,7 @@ package openvpn3
 //   -I${SRCDIR}/openvpn        => <client/ovpncli.hpp>, <openvpn/...>
 //   -I${SRCDIR}/shim           => "ovpncli_shim.hpp"
 //   -I${SRCDIR}/deps/asio/...  => <asio.hpp>            (header-only, USE_ASIO)
-//   -I${SRCDIR}/deps/lz4/lib   => <lz4.h>               (HAVE_LZ4)
+//   -I${SRCDIR}/deps/compression/upstream/lz4/lib   => <lz4.h>               (HAVE_LZ4)
 //   -I${SRCDIR}/deps/jsoncpp/include => <json/json.h>
 //
 // Required preprocessor defines (mirrors OpenVPN3 CMake + io/io.hpp):
@@ -45,12 +45,12 @@ package openvpn3
 //   -lstdc++               C++ runtime (cgo links with gcc, not g++)
 //
 // LZ4 + the OpenVPN3 epoch crypto impl are compiled IN-PACKAGE as extra TUs
-// (cgo_lz4.c includes deps/lz4/lib/lz4.c; cgo_core_epoch_windows.cpp includes
+// (cgo_lz4.c includes deps/compression/upstream/lz4/lib/lz4.c; cgo_core_epoch_windows.cpp includes
 // openvpn/crypto/data_epoch.cpp) because ovpncli.cpp's single-TU does not emit
 // those symbols. No external -llz4 is needed.
 
 /*
-#cgo CPPFLAGS: -I${SRCDIR}/openvpn -I${SRCDIR}/openvpn/client -I${SRCDIR}/shim -I${SRCDIR}/deps/asio/asio/include -I${SRCDIR}/deps/lz4/lib -I${SRCDIR}/deps/jsoncpp/include -I${SRCDIR}/deps/tap-windows/include
+#cgo CPPFLAGS: -I${SRCDIR}/openvpn -I${SRCDIR}/openvpn/client -I${SRCDIR}/shim -I${SRCDIR}/deps/asio/asio/include -I${SRCDIR}/deps/compression/upstream/lz4/lib -I${SRCDIR}/deps/jsoncpp/include -I${SRCDIR}/deps/tap-windows/include
 #cgo CPPFLAGS: -DUSE_OPENSSL -DUSE_ASIO -DASIO_STANDALONE -DHAVE_LZ4 -DOPENVPN_CORE_API_VISIBILITY_HIDDEN
 #cgo CPPFLAGS: -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN -DNOMINMAX
 // TAP_WIN_COMPONENT_ID is "generally defined on cl command line" by the upstream

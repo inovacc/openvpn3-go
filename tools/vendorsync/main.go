@@ -52,15 +52,7 @@ var trees = []tree{
 			"asio/LICENSE_1_0.txt": "deps/asio/asio/LICENSE_1_0.txt",
 		},
 	},
-	{
-		Name: "lz4",
-		URL:  "https://github.com/lz4/lz4.git",
-		Ref:  "v1.8.3",
-		Keep: map[string]string{
-			"lib":     "deps/lz4/lib",
-			"LICENSE": "deps/lz4/LICENSE",
-		},
-	},
+	// lz4 is not fetched: it lives in the deps/compression submodule (inovacc-shared/compression).
 	{
 		Name: "jsoncpp",
 		URL:  "https://github.com/open-source-parsers/jsoncpp.git",
@@ -87,7 +79,7 @@ var trees = []tree{
 var vendorRoots = []struct{ name, path string }{
 	{"openvpn3", "openvpn"},
 	{"asio", "deps/asio"},
-	{"lz4", "deps/lz4"},
+	{"lz4", "deps/compression/upstream/lz4"}, // submodule inovacc-shared/compression: verified, not fetched
 	{"jsoncpp", "deps/jsoncpp"},
 	{"tap-windows6", "deps/tap-windows"},
 }

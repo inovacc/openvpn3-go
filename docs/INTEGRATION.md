@@ -1,6 +1,6 @@
 # Incremental Integration Guide
 
-<!-- rev:003 -->
+<!-- rev:004 (RFC 3339) 2026-11-07T20:30:01Z -->
 
 How the OpenVPN3 **Go + C/C++** set is integrated in this module: all C/C++
 build dependencies (OpenVPN3 core, asio, lz4, jsoncpp, tap-windows.h) are
@@ -47,7 +47,7 @@ for the authoritative set. They point at the vendored trees via
 
 ```go
 /*
-#cgo CPPFLAGS: -I${SRCDIR}/openvpn -I${SRCDIR}/shim -I${SRCDIR}/deps/asio/asio/include -I${SRCDIR}/deps/lz4/lib -I${SRCDIR}/deps/jsoncpp/include -I${SRCDIR}/deps/tap-windows/include
+#cgo CPPFLAGS: -I${SRCDIR}/openvpn -I${SRCDIR}/shim -I${SRCDIR}/deps/asio/asio/include -I${SRCDIR}/deps/compression/upstream/lz4/lib -I${SRCDIR}/deps/jsoncpp/include -I${SRCDIR}/deps/tap-windows/include
 #cgo CPPFLAGS: -DUSE_OPENSSL -DUSE_ASIO -DASIO_STANDALONE -DHAVE_LZ4
 #cgo CXXFLAGS: -std=c++17 -fexceptions
 #cgo LDFLAGS: -lssl -lcrypto -lstdc++

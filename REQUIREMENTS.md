@@ -64,7 +64,7 @@ Platform: **Windows only** (the binding is `*_windows`; uses WFP/TUN/Win32 APIs)
 cgo compiles C/C++ TUs that live **directly** in `pkg/openvpn3/` (never subdirs):
 - `cgo_bridge.cpp` — the single TU; `#include`s the shim (`shim/`) + the OpenVPN3
   single-TU core (`openvpn/client/ovpncli.cpp`).
-- `cgo_lz4.c` — `#include`s `deps/lz4/lib/lz4.c`.
+- `cgo_lz4.c` — `#include`s `deps/compression/upstream/lz4/lib/lz4.c` (submodule inovacc-shared/compression).
 - `cgo_core_epoch_windows.cpp` — `#include`s `openvpn/crypto/data_epoch.cpp`
   (symbols `ovpncli.cpp`'s single-TU doesn't emit).
 

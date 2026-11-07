@@ -1,0 +1,3 @@
+[submodule "deps/compression"]
+	path = deps/compression
+	url = https://github.com/inovacc-shared/compression.git

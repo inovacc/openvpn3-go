@@ -12,13 +12,13 @@ maintainer tool (`task vendor:sync`); their checksums are printed by
 |------|----------|-----|---------|----------------------------------|
 | `openvpn/` | https://github.com/OpenVPN/openvpn3 | `5b7841a847619e9e1ba3f7371e0c9e2743383481` (tag `release/3.11.6`) | MPL-2.0 OR AGPL-3.0-only (dual; see election below) | `5fed8e5e743cff0feaabbbdea65eb9f181342f54c26e66e6a2c22fcd74833086` |
 | `deps/asio/` | https://github.com/chriskohlhoff/asio | tag `asio-1-24-0` | Boost Software License 1.0 | `7ea6ae8980cc307fae608e8c24227b3641aa11de2670f1c71b1481d9a5e8be88` |
-| `deps/lz4/` | https://github.com/lz4/lz4 | tag `v1.8.3` | BSD 2-Clause (lib/) | `dbf2894929545480b7b4cfa448212503818e7b6ab76a77590c215e73dcf65927` |
+| `deps/compression/upstream/lz4/` (submodule inovacc-shared/compression) | https://github.com/lz4/lz4 | tag `v1.8.3` | BSD 2-Clause (lib/) | `dbf2894929545480b7b4cfa448212503818e7b6ab76a77590c215e73dcf65927` |
 | `deps/jsoncpp/` | https://github.com/open-source-parsers/jsoncpp | tag `1.8.4` | MIT / Public Domain | `cb0c78304b342a5bc60416f7af31b7c7dc72fedf04052820093fca15389512b4` |
 | `deps/tap-windows/` | https://github.com/OpenVPN/tap-windows6 | vendored at HEAD `0cad8664c2a51832df61f2e1853b6da317d1c129` on 2026-07-02 (upstream ref is HEAD/unpinned) | MIT (this header file only; the driver itself is GPLv2) | `ac3e15a3e71a778c463e11b542911044247075d9efbf41267906982df7b44128` |
 
 Each tree retains its upstream license file(s) in place
 (`openvpn/LICENSE.md`, `openvpn/LICENSES/`, `deps/asio/asio/LICENSE_1_0.txt`,
-`deps/lz4/LICENSE`, `deps/jsoncpp/LICENSE`).
+`deps/compression/upstream/lz4/LICENSE`, `deps/jsoncpp/LICENSE`).
 
 Local modification: `openvpn/openvpn/win/call.hpp` carries a two-line patch
 (CREATE_NO_WINDOW / SW_HIDE) so netsh/route child processes spawn without a
